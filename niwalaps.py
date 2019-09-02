@@ -128,8 +128,9 @@ def main():
 
     # 現在時刻からファイル名を決定
     strDate = datetime.datetime.now().strftime('%Y%m%d_%H%M')
-    fName = '/home/pi/data/waniwa/img/waniwa_{}.jpg'.format(strDate)
-    fNameS = '/home/pi/data/waniwa/simg/waniwa_{}.jpg'.format(strDate)
+    dirName = os.path.dirname(__file__)
+    fName = os.path.join(dirName, f'img/waniwa_{strDate}.jpg')
+    fNameS = os.path.join(dirName, f'simg/waniwa_{strDate}.jpg')
 
     shutter(fName)
     shrinkImage(fName, fNameS)

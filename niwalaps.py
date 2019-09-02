@@ -11,7 +11,6 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 import smtplib
 import os
-from requests_oauthlib import OAuth1Session
 import json
 
 strLog = ''
@@ -48,15 +47,6 @@ def shutter(fName):
     proc = subprocess.run(cmd, stdout=subprocess.PIPE)
     setLog(proc.stdout.decode('utf8'))
 
-#ret = subprocess.call(cmd)
-
-#   if ret == 0:
-#       print("Image is saved as {}".format(fName))
-#   else:
-#       print("Image is not saved")
-
-#   return ret
-
 
 # 画像を縮小
 def shrinkImage(fName, fNameS):
@@ -68,31 +58,6 @@ def shrinkImage(fName, fNameS):
     img.save(fNameS)
 
     setLog("Image is shrinked to w={}, h={}\n".format(w_new, h_new))
-
-
-# 引数の画像ファイルを添付してTweet
-def tweet(fName):
-    URL_MEDIA = 'https://upload.twitter.com/1.1/media/upload.json'
-    URL_STATUS = 'https://api.twitter.com/1.1/statuses/update.json'
-
-    twitter = OAuth1Session(config.TW_CONSUMER_API_KEY, config.TW_CONSUMER_API_SEC, config.TW_ACCESS_TOKEN, config.TW_ACCESS_TOKEN_SEC)
-
-    with open(fName, 'rb') as f:
-        data = f.read()
-        files = {"media" : data}
-        res = twitter.post(URL_MEDIA, files=files)
-        print('media upload response = {}'.format(res.status_code))
-
-    if res.status_code == 200:
-        media_id = json.loads(res.text)['media_id']
-        strDate = datetime.datetime.now().strftime('%Y,%m,%d %H:%M')
-        status = '毎日自動で撮影中。 #今日の庭 #ラズパイカメラ #定点観測 \n' + strDate
-        params = {
-            'status' : status,
-            'media_ids' : [media_id]
-        }
-        res = twitter.post(URL_STATUS, params=params)
-        print('status update response = {}'.format(res.status_code))
 
 
 # 縮小した画像をメールで送信
@@ -110,20 +75,14 @@ def sendMail(fName):
     msg.attach(img)
 
     # 送信
-    print('sendmail:1')
     smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    print('sendmail:2')
     smtp.starttls()
-    print('sendmail:3')
     smtp.login(config.GM_ADDR, config.GM_PASS)
-    print('sendmail:4')
     smtp.send_message(msg)
-    print('sendmail:5')
     smtp.quit()
-    print('sendmail:6')
 
 
-def main():
+if __name__ == "__main__":
     clrLog()
 
     # 現在時刻からファイル名を決定
@@ -135,7 +94,4 @@ def main():
     shutter(fName)
     shrinkImage(fName, fNameS)
     sendMail(fNameS)
-    #tweet(fNameS)
 
-if __name__ == "__main__":
-    main()

@@ -2,7 +2,7 @@
 Description=Waniwa timelaps
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/data/waniwa/niwalaps.py
+ExecStart=/usr/bin/python3 /home/pi/niwalaps/niwalaps.py
 #Restart=always
 Type=simple
 

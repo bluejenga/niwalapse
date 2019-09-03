@@ -11,26 +11,20 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 import smtplib
 import os
-import json
 
 strLog = ''
 
 
 # ログに文字列を追加。同時に標準出力にも出力
-def setLog(str):
+def setLog(s):
     global strLog
-    strLog += str
-    print(str)
+    strLog = strLog + s
+    print(s)
 
 # ログ文字列を取得
 def getLog():
     global strLog
     return strLog
-
-# ログ文字列をクリア
-def clrLog():
-    global strLog
-    strLog = ''
 
 
 # 写真を撮る。
@@ -44,7 +38,7 @@ def shutter(fName):
         '--verbose',
         ]
 
-    proc = subprocess.run(cmd, stdout=subprocess.PIPE)
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     setLog(proc.stdout.decode('utf8'))
 
 
@@ -83,7 +77,6 @@ def sendMail(fName):
 
 
 if __name__ == "__main__":
-    clrLog()
 
     # 現在時刻からファイル名を決定
     strDate = datetime.datetime.now().strftime('%Y%m%d_%H%M')
